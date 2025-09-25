@@ -40,12 +40,15 @@
             border-radius: 12px;
             margin: 15px;
             box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+            flex-wrap: wrap;
         }
         .category-card {
             text-align: center;
             flex: 1;
+            min-width: 100px;
             cursor: pointer;
             transition: transform 0.2s;
+            margin: 5px;
         }
         .category-card:hover { transform: scale(1.05); }
         .category-card img {
@@ -100,12 +103,13 @@
             "mall" => "Malls & Entertainment"
         ];
 
-        $where = "";
+        $where = "WHERE latitude BETWEEN 14.5300 AND 14.8200 
+                  AND longitude BETWEEN 121.0000 AND 121.1500"; // ✅ QC bounding box
         $heading = "Most Recent Places";
 
         if (isset($_GET['category']) && array_key_exists($_GET['category'], $categoryNames)) {
             $category = $_GET['category'];
-            $where = "WHERE category = '$category'";
+            $where .= " AND category = '$category'";
             $heading = $categoryNames[$category];
         }
 
@@ -120,13 +124,13 @@
                 while ($row = $result->fetch_assoc()) {
                     echo "<div class='card'>";
                     if ($row['photo']) {
-                        echo "<img src='uploads/{$row['photo']}' alt='{$row['name']}'>";
+                        echo "<img src='uploads/{$row['photo']}' alt='".htmlspecialchars($row['name'])."'>";
                     } else {
                         echo "<img src='https://via.placeholder.com/300x150?text=No+Image' alt='No photo'>";
                     }
                     echo "<div class='card-content'>";
-                    echo "<h3>{$row['name']}</h3>";
-                    echo "<p>" . substr($row['description'], 0, 80) . "...</p>";
+                    echo "<h3>".htmlspecialchars($row['name'])."</h3>";
+                    echo "<p>" . htmlspecialchars(substr($row['description'], 0, 80)) . "...</p>";
                     echo "<a href='index.php?lat={$row['latitude']}&lng={$row['longitude']}'>View on Map</a>";
                     echo "</div></div>";
                 }
